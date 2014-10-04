@@ -1,0 +1,26 @@
+blog needs to update (live vs. periodically)
+  upon update, process database for articles to display
+  update recently published pages with new editorials?
+  flag articles with whether or not they've been published
+
+  daily cleaning (can be implemented post-hackathon)
+    query for an delete outdated articles
+  
+  updates with more recent news (can also be implemented post-hackathon hehe)
+    RSS feeds will continuously fetch new editorials
+    
+  database contains:
+    article url -> timestamp, sentiment, whether article has been displayed
+
+Set up and figure out how to efficiently query database to construct a post
+ 
+IDOL OnDemand:
+  given editorials, run topic/entity extraction
+    for topics with sufficiently high discussion, run sentiment analysis
+  or just run sentiment analysis
+
+Reach:
+  incorporate comments from reddit, twitter, and other social sites (idk any more)
+
+Optimizations:
+  do initial filtering based on article title only, then process the full text
