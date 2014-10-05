@@ -1,0 +1,4 @@
+Flask==0.9
+Jinja2==2.6
+Flask-SQLAlchemy==2.0
+SQLAlchemy==0.9.7
