@@ -36,4 +36,7 @@ def show_topic_page(topic):
 def shutdown_session(exception=None):
     session.close()
 
-from app import models
+import models
+
+if __name__ == '__main__':
+    app.run(host = ('0.0.0.0'))
