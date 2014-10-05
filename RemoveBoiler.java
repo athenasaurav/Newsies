@@ -19,7 +19,7 @@ public class RemoveBoiler {
         ArticleExtractor a = new ArticleExtractor();
         DefaultExtractor e = new DefaultExtractor();
 
-        String text = e.getText(bb_url);
+        String text = e.getText(my_url);
         System.out.println(text);
 
         } catch (Exception e) {

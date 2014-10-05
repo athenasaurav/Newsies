@@ -27,7 +27,7 @@ def fetch():
             items.append(entry["link"])
             manage.write_db(entry)
     
-    f = open('urlFile', 'r+')
+    f = open('urlFile', 'w')
     
     for item in items:
         f.write(item + '\n')

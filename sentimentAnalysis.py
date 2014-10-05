@@ -15,6 +15,23 @@ sentimentURL = "https://api.idolondemand.com/1/api/sync/detectsentiment/v1"
 CalaisAPIkey = "whavuymcpufba7f6q5d7ph2r"
 CalaisURL = "http://api.opencalais.com/tag/rs/enrich"
 
+def repeatABunch(urls):
+    ts = []
+    for i, line in enumerate(urls):
+        ts.append(topicsAndSentiments(i, line))
+    return ts
+
+def topicsAndSentiments(i, url, verbose=False):
+    if verbose:
+        print "URL:", url
+        print "removing junk from page"
+    content = removeBoiler(i, url)
+    if verbose:
+        print "Content:", content
+    t = topics(content)
+    s = sentiments(content)
+    return t, s 
+
 def resolveReferences(db):
     for elem in db:
         for attrib in db[elem]:
@@ -61,17 +78,6 @@ def computeSentiment(s, c):
     l = max(len(c), 1)
     return pos * 50.0 / l , neg * 50.0 / l
 
-
-def topicsAndSentiments(i, url, verbose=False):
-    if verbose:
-        print "URL:", url
-        print "removing junk from page"
-    content = removeBoiler(i, url)
-    if verbose:
-        print "Content:", content
-    t = topics(content)
-    s = sentiments(content)
-    return t, s 
 
 def removeBoiler(i, url):
     filepath = "out" + str(i) + ".txt"

@@ -6,12 +6,25 @@ app = Flask(__name__)
 app.config.from_pyfile("config.py")
 db = SQLAlchemy(app)
 
+all_published = []
+
 @app.route('/')
 def hello_world():
     (topic, articles) = publish()
-    # summary: article.summ
-    # title: article.title
-    # url: article.url
+    if topic is not None:        
+        all_published.append((topic, articles))
+        # summary: article.summ
+        # title: article.title
+        # url: article.url
+        data = {"clumps" : [{'title' : a1.title,
+                             'image' : 'mudkip.png',
+                             'url'   : a1.url,
+                             'info'  : a1.summ,
+                             'viewpoint1' : a2.url,
+                             'viewpoint1blurb' : a2.title,
+                             'viewpoint2' : a1.url,
+                             'viewpoint2blurb' : a1.title
+                             } for (t, [a1, a2]) in all_published]}
     return render_template('bootstrap_mainpage.html', data)
 
 @app.route('/post/<topic>')
