@@ -15,15 +15,63 @@ sentimentURL = "https://api.idolondemand.com/1/api/sync/detectsentiment/v1"
 CalaisAPIkey = "whavuymcpufba7f6q5d7ph2r"
 CalaisURL = "http://api.opencalais.com/tag/rs/enrich"
 
+def resolveReferences(db):
+    for elem in db:
+        for attrib in db[elem]:
+            val = db[elem][attrib]
+            if type(val) == unicode:
+                if val in db:
+                    db[elem][attrib] = db[val]
+    return db
+
+def createHierarchy(db):
+    newdb = {}
+    for elem in db:
+        elemType = db[elem].get(u'_type')
+        elemGroup = db[elem].get(u'_typeGroup')
+        if elemGroup is not None:
+            if elemGroup not in newdb:
+                newdb[elemGroup] = {}
+            if elemType is not None:
+                if elemType not in newdb[elemGroup]:
+                    newdb[elemGroup][elemType] = {}
+                newdb[elemGroup][elemType][elem] = db[elem]
+            else:
+                newdb[elemGroup][elem] = db[elem]
+        else:
+            newdb[elem] = db[elem]
+    return newdb
+
+def extractRelevance(db):
+    termList = []
+    simpleDB = createHierarchy(resolveReferences(db)).get(u'entities')
+    for group in simpleDB:
+        for hash_val in simpleDB[group]:
+            topvals = simpleDB[group][hash_val]
+            if u'name' in topvals and u'relevance' in topvals:
+                tupl = (topvals[u'name'], topvals[u'relevance'])
+                termList.append(tupl)
+    return termList
+
+def computeSentiment(s, c):
+    evaluate = lambda d : d[u'score'] * d[u'normalized_length']
+    pos = sum(map(evaluate, s[u'positive']))
+    neg = sum(map(evaluate, s[u'negative']))
+
+    l = max(len(c), 1)
+    return pos * 50.0 / l , neg * 50.0 / l
+
+
 def topicsAndSentiments(i, url, verbose=False):
-    print "URL:", url
     if verbose:
+        print "URL:", url
         print "removing junk from page"
     content = removeBoiler(i, url)
-    print "Content:", content
+    if verbose:
+        print "Content:", content
     t = topics(content)
     s = sentiments(content)
-    return t, s
+    return t, s 
 
 def removeBoiler(i, url):
     filepath = "out" + str(i) + ".txt"
@@ -47,7 +95,7 @@ def sentiments(content, verbose=False):
 
     s = response.read()
     d = json.loads(s)
-    print d
+    return computeSentiment(d, content)
 
 def topics(content, verbose=False):
     if verbose:
@@ -63,8 +111,8 @@ def topics(content, verbose=False):
 
     s = response.read()
     d = json.loads(s)
-    print d
+    return extractRelevance(d)
 
 if __name__ == "__main__":
     for arg in sys.argv[1:]:
-        topicsAndSentiments(0, arg)
+        print topicsAndSentiments(0, arg)
